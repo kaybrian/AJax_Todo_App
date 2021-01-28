@@ -58,6 +58,7 @@
     const csrftoken = getCookie('csrftoken');
 
     var activeItem = null
+    var list_snapshot = []
 
     
 
@@ -66,7 +67,7 @@
 
     function buildList(){
         var wrapper = document.getElementById('list-wrapper')
-        wrapper.innerHTML = ''
+      //    wrapper.innerHTML = ''
 
         var url = 'http://127.0.0.1:8000/api/task-list/'
 
@@ -77,10 +78,23 @@
 
             var list = data
             for (var i in list){
+
+                try{
+                    document.getElementById(`data-row-${i}`).remove()
+                }catch(err){
+                    
+                }
+
+                var title = `<span class="title">${list[i].title}</span>`
+
+                if(list[i].completed == true){
+                    title = `<strike class="title">${list[i].title}</strike>`
+                }
+
                 var item = `
                     <div id="data-row-${i}" class="flex-wrapper task-wrapper">
                         <div style="flex:5">
-                            <span class="title">${list[i].title}</span>
+                            ${title}
                         <div>
                         <div style="flex:1">
                             <button class="btn btn-sm btn-outline-info edit">Edit</button>
@@ -92,9 +106,15 @@
                 `
                     
                 wrapper.innerHTML += item
-
-                
             }
+            if(list_snapshot.length > list.length){
+                for(var i = list.length; i < list_snapshot.length; i++ ){
+                    document.getElementById(`data-row-${i}`).remove()
+                }
+            }
+            list_snapshot = list
+
+
             for (var i in list){
                 var editBtn = document.getElementsByClassName('edit')[i]
                 var deleteBtn = document.getElementsByClassName('delete')[i] 
